@@ -55,8 +55,9 @@ st.sidebar.markdown("---")
 
 if page == "Vue générale":
     st.title("Dashboard Chambre / Central ")
-    st_autorefresh(interval=2000, key="refresh_vue_generale")
-
+    st_autorefresh(interval=5000, key="refresh_vue_generale")
+    if st.button("Rafraîchir maintenant"):
+        st.experimental_rerun()
     try:
         chambre = get_json(URL_CHAMBRE)
     except Exception as e:
