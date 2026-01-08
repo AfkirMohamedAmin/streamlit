@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 import requests
-from streamlit_autorefresh import st_autorefresh
+
+import streamlit as st
+import time
+
 
 # =========================
 # CONFIG
@@ -55,8 +58,7 @@ st.sidebar.markdown("---")
 
 if page == "Vue générale":
     st.title("Dashboard Chambre / Central ")
-    st_autorefresh(interval=2000, key="refresh_vue_generale")
-
+    
     try:
         chambre = get_json(URL_CHAMBRE)
     except Exception as e:
@@ -106,8 +108,7 @@ if page == "Vue générale":
 
 elif page == "Comande":
     st.title("Dashboard Commandes")
-    st_autorefresh(interval=700, key="refresh_central_fast")
-
+    
     st.subheader("Commandes")
     c1, c2, c3, c4, c5 = st.columns(5)
 
@@ -200,3 +201,6 @@ elif page == "liste accès":
 
     except Exception as e:
         st.error(f"Erreur /api/infirmiers: {e}")
+
+time.sleep(5)
+st.experimental_rerun()
