@@ -74,13 +74,13 @@ if page == "Vue générale":
     st_autorefresh(interval=10000, key="refresh_vue_generale")
 
     try:
-        chambre = get_json(URL_CHAMBRE)
+        chambre = get_json_stable(URL_CHAMBRE)
     except Exception as e:
         st.error(f"Erreur /api/chambre: {e}")
         chambre = {}
 
     try:
-        central = get_json(URL_CENTRAL)
+        central = get_json_stable(URL_CENTRAL)
     except Exception as e:
         st.error(f"Erreur /api/central: {e}")
         central = {}
@@ -171,7 +171,7 @@ if page == "Vue générale":
 
 
     try:
-        appel = get_json(URL_APPELS)
+        appel = get_json_stable(URL_APPELS)
     except Exception as e:
         st.error(f"Erreur appel en cours: {e}")
         appel = {}
@@ -198,7 +198,7 @@ elif page == "historique":
     with i1:
         st.subheader("Historique central")
         try:
-            data = get_json(URL_historique_central)  # ex: /api/historiquecentral
+            data = get_json_stable(URL_historique_central)  # ex: /api/historiquecentral
             df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
             st.dataframe(df, use_container_width=True)
         except Exception as e:
@@ -207,7 +207,7 @@ elif page == "historique":
     with i2:
         st.subheader("Historique chambre")
         try:
-            data = get_json(URL_historique_chambre)  # ex: /api/historique
+            data = get_json_stable(URL_historique_chambre)  # ex: /api/historique
             df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
             st.dataframe(df, use_container_width=True)
         except Exception as e:
@@ -215,7 +215,7 @@ elif page == "historique":
 
     st.subheader("Historique interventions")
     try:
-            data = get_json(URL_INTERVENTION)  # ex: /api/historique
+            data = get_json_stable(URL_INTERVENTION)  # ex: /api/historique
             df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
             st.dataframe(df, use_container_width=True)
     except Exception as e:
@@ -253,7 +253,7 @@ elif page == "liste accès":
 
     st.subheader("Liste d'accès")
     try:
-        infirmiers = get_json(URL_INF_LIST)
+        infirmiers = get_json_stable(URL_INF_LIST)
         df_inf = to_df(infirmiers)
 
         search = st.text_input("Rechercher (nom / prénom / uid / email)")
