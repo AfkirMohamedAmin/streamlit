@@ -30,6 +30,21 @@ def get_json(url: str, timeout: int = 8):
     r.raise_for_status()
     return r.json()
 
+def get_json_stable(key, url):
+    if key not in st.session_state:
+        st.session_state[key] = {}
+
+    try:
+        data = get_json(url)
+        st.session_state[key] = data
+        return data
+    except Exception:
+        return st.session_state[key]
+
+def refresh_now():
+    get_json.clear()   # efface seulement le cache de fetch_json
+    st.rerun()
+
 
 def post_json(url, payload, timeout=8):
     r = requests.post(url, json=payload, timeout=timeout)
@@ -53,8 +68,7 @@ if page == "Vue générale":
     b1, b2 = st.columns([1, 4])
     with b1:
         if st.button("🔄 Rafraîchir maintenant"):
-            st.cache_data.clear()
-            st.rerun()
+            refresh_now()
 
     st.title("Dashboard Chambre / Central ")
     st_autorefresh(interval=10000, key="refresh_vue_generale")
@@ -114,8 +128,7 @@ if page == "Vue générale":
             try:
                 post_json(URL_CENTRAL_CMD, {"modauto": 1})
                 st.success("AUTO envoyé")
-                st.cache_data.clear()
-                st.rerun()
+                refresh_now()
             except Exception as e:
                 st.error(f"Erreur AUTO: {e}")
 
@@ -124,8 +137,7 @@ if page == "Vue générale":
             try:
                 post_json(URL_CENTRAL_CMD, {"modauto": 0})
                 st.success("MANU envoyé")
-                st.cache_data.clear()
-                st.rerun()
+                refresh_now()
                 
             except Exception as e:
                 st.error(f"Erreur MANU: {e}")
@@ -135,8 +147,7 @@ if page == "Vue générale":
             try:
                 post_json(URL_CENTRAL_CMD, {"sos": 1})
                 st.success("SOS envoyé")
-                st.cache_data.clear()
-                st.rerun()
+                refresh_now()
             except Exception as e:
                 st.error(f"Erreur SOS: {e}")
 
@@ -145,8 +156,7 @@ if page == "Vue générale":
             try:
                 post_json(URL_TEST_FIRE, {"fire": 1})
                 st.success("Test feu envoyé ")
-                st.cache_data.clear()
-                st.rerun()
+                refresh_now()
             except Exception as e:
                 st.error(f"Erreur test feu: {e}")
 
@@ -155,8 +165,7 @@ if page == "Vue générale":
             try:
                 post_json(URL_CENTRAL_CMD, {"acquit": 1})
                 st.success("ACQUIT envoyé")
-                st.cache_data.clear()
-                st.rerun()
+                refresh_now()
             except Exception as e:
                 st.error(f"Erreur ACQUIT: {e}")
 
