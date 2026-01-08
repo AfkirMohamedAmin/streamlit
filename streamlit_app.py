@@ -166,7 +166,7 @@ if page == "Vue générale":
             except Exception as e:
                 st.error(f"Erreur ACQUIT: {e}")
 
-    appel = get_json(URL_APPELS)
+
     try:
         appel = get_json(URL_APPELS)
     except Exception as e:
