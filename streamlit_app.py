@@ -19,6 +19,11 @@ URL_CENTRAL_CMD = f"{BASE}/api/central/cmd"
 URL_TEST_FIRE = f"{BASE}/api/test/fire"
 
 
+URL_INTERVENTION = f"{BASE}/api/historiqueinterventions"
+URL_historique_chambre = f"{BASE}/api/historique"
+URL_historique_central = f"{BASE}/api/historiquecentral"
+
+
 @st.cache_data(ttl=1)
 def get_json(url):
     r = requests.get(url, timeout=5)
@@ -47,17 +52,19 @@ def to_df(data):
 
 
 st.sidebar.title("Menu")
-page = st.sidebar.radio(
-    "Aller à",
-    ["Vue générale", "Comande", "liste accès"]
-)
+page = st.sidebar.radio("Aller à", ["Vue générale", "historique", "liste accès"])
 st.sidebar.markdown("---")
 
 if page == "Vue générale":
+    b1, b2 = st.columns([1, 4])
+    with b1:
+        if st.button("🔄 Rafraîchir maintenant"):
+            st.cache_data.clear()
+            st.rerun()
+
     st.title("Dashboard Chambre / Central ")
-    st_autorefresh(interval=5000, key="refresh_vue_generale")
-    if st.button("Rafraîchir maintenant"):
-        st.experimental_rerun()
+    st_autorefresh(interval=10000, key="refresh_vue_generale")
+
     try:
         chambre = get_json(URL_CHAMBRE)
     except Exception as e:
@@ -104,11 +111,7 @@ if page == "Vue générale":
 
         st.caption(f"Timestamp central: {central.get('timestamp','-')}")
         st.dataframe(to_df(central), use_container_width=True)
-
-elif page == "Comande":
-    st.title("Dashboard Commandes")
-    st_autorefresh(interval=700, key="refresh_central_fast")
-
+    
     st.subheader("Commandes")
     c1, c2, c3, c4, c5 = st.columns(5)
 
@@ -117,6 +120,8 @@ elif page == "Comande":
             try:
                 post_json(URL_CENTRAL_CMD, {"modauto": 1})
                 st.success("AUTO envoyé")
+                st.cache_data.clear()
+                st.rerun()
             except Exception as e:
                 st.error(f"Erreur AUTO: {e}")
 
@@ -125,6 +130,9 @@ elif page == "Comande":
             try:
                 post_json(URL_CENTRAL_CMD, {"modauto": 0})
                 st.success("MANU envoyé")
+                st.cache_data.clear()
+                st.rerun()
+                
             except Exception as e:
                 st.error(f"Erreur MANU: {e}")
 
@@ -133,6 +141,8 @@ elif page == "Comande":
             try:
                 post_json(URL_CENTRAL_CMD, {"sos": 1})
                 st.success("SOS envoyé")
+                st.cache_data.clear()
+                st.rerun()
             except Exception as e:
                 st.error(f"Erreur SOS: {e}")
 
@@ -141,6 +151,8 @@ elif page == "Comande":
             try:
                 post_json(URL_TEST_FIRE, {"fire": 1})
                 st.success("Test feu envoyé ")
+                st.cache_data.clear()
+                st.rerun()
             except Exception as e:
                 st.error(f"Erreur test feu: {e}")
 
@@ -149,9 +161,63 @@ elif page == "Comande":
             try:
                 post_json(URL_CENTRAL_CMD, {"acquit": 1})
                 st.success("ACQUIT envoyé")
+                st.cache_data.clear()
+                st.rerun()
             except Exception as e:
                 st.error(f"Erreur ACQUIT: {e}")
 
+    appel = get_json(URL_APPELS)
+    try:
+        appel = get_json(URL_APPELS)
+    except Exception as e:
+        st.error(f"Erreur appel en cours: {e}")
+        appel = {}
+
+    if not appel:
+            st.info("✅ Aucun alerte en cours.")
+    else:
+        st.subheader("📞 Alerte en cours")
+
+
+        a1, a2, a3, a4, a5 = st.columns(5)
+        a1.metric("Chambre", f"{appel.get('chambre','-')}")
+        a2.metric("Type alerte", f"{appel.get('type_alerte','-')}")
+        a3.metric("Date prise", f"{appel.get('date_prise','-')}")
+        a4.metric("Infirmier UID", f"{appel.get('infirmier_uid','-')}")
+        a5.metric("Infirmier nom", f"{appel.get('infirmier_nom','-')}")
+
+elif page == "historique":
+    st.title("Historique des données")
+
+    
+    st_autorefresh(interval=5000, key="refresh_hist")
+    i1, i2 = st.columns(2)
+    with i1:
+        st.subheader("Historique central")
+        try:
+            data = get_json(URL_historique_central)  # ex: /api/historiquecentral
+            df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
+            st.dataframe(df, use_container_width=True)
+        except Exception as e:
+            st.error(f"Erreur historique: {e}")
+    
+    with i2:
+        st.subheader("Historique chambre")
+        try:
+            data = get_json(URL_historique_chambre)  # ex: /api/historique
+            df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
+            st.dataframe(df, use_container_width=True)
+        except Exception as e:
+            st.error(f"Erreur historique: {e}")
+
+    st.subheader("Historique interventions")
+    try:
+            data = get_json(URL_INTERVENTION)  # ex: /api/historique
+            df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
+            st.dataframe(df, use_container_width=True)
+    except Exception as e:
+            st.error(f"Erreur historique: {e}")
+    
 elif page == "liste accès":
     st.title("Gestion d'accès (manuel)")
 
