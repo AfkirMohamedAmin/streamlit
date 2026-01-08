@@ -23,19 +23,11 @@ URL_INTERVENTION = f"{BASE}/api/historiqueinterventions"
 URL_historique_chambre = f"{BASE}/api/historique"
 URL_historique_central = f"{BASE}/api/historiquecentral"
 
-
-@st.cache_data(ttl=1)
-def get_json(url):
-    r = requests.get(url, timeout=5)
+@st.cache_data(ttl=2, show_spinner=False)
+def fetch_json(url: str, timeout: int = 8):
+    r = requests.get(url, timeout=timeout, headers={"Cache-Control": "no-cache"})
     r.raise_for_status()
     return r.json()
-
-
-def get_json(url, timeout=8):
-    r = requests.get(url, timeout=timeout)
-    r.raise_for_status()
-    return r.json()
-
 
 def post_json(url, payload, timeout=8):
     r = requests.post(url, json=payload, timeout=timeout)
