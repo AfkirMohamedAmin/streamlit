@@ -25,7 +25,7 @@ URL_historique_central = f"{BASE}/api/historiquecentral"
 # =========================
 # HELPERS
 # =========================
-@st.cache_data(ttl=2)
+@st.cache_data(ttl=1)
 def get_json(url, timeout=8):
     r = requests.get(url, timeout=timeout)
     r.raise_for_status()
