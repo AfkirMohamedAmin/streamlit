@@ -25,7 +25,7 @@ URL_historique_central = f"{BASE}/api/historiquecentral"
 
 
 @st.cache_data(ttl=2, show_spinner=False)
-def get_json(url: str, timeout: int = 2):
+def get_json(url: str, timeout: int = 8):
     r = requests.get(url, timeout=timeout, headers={"Cache-Control": "no-cache"})
     r.raise_for_status()
     return r.json()
