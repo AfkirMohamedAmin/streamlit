@@ -103,7 +103,7 @@ if page == "Vue générale":
         t2.metric("help", f"{chambre.get('help','-')}")
         t3.metric("sos", f"{chambre.get('sos','-')}")
 
-        st.json(chambre)
+        
     with col_droite:
         st.subheader("Central")
 
@@ -115,7 +115,7 @@ if page == "Vue générale":
         x1.metric("Seuil", f"{central.get('seuil','-')}")
         x2.metric("Mode auto", f"{central.get('modauto','-')}")
 
-        st.json(central)
+        
     
     st.subheader("Commandes")
     c1, c2, c3, c4, c5 = st.columns(5)
@@ -198,7 +198,7 @@ elif page == "historique":
         try:
             data = get_json_stable("hist_central_last", URL_historique_central)
  
-            df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
+            df = pd.DataFrame(data)                  
             st.dataframe(df, use_container_width=True)
         except Exception as e:
             st.error(f"Erreur historique: {e}")
@@ -253,22 +253,11 @@ elif page == "liste accès":
     st.divider()
 
     st.subheader("Liste d'accès")
+  
     try:
-        infirmiers = get_json_stable("inf_list_last", URL_INF_LIST)
+                data  = get_json_stable("inf_list_last", URL_INF_LIST)
 
-        df_inf = to_df(infirmiers)
-
-        search = st.text_input("Rechercher (nom / prénom / uid / email)")
-        if search and not df_inf.empty:
-            mask = df_inf.astype(str).apply(
-                lambda col: col.str.contains(search, case=False, na=False)
-            )
-            df_inf = df_inf[mask.any(axis=1)]
-
-        if "id" in df_inf.columns:
-            df_inf = df_inf.sort_values("id", ascending=False)
-
-        st.dataframe(df_inf, use_container_width=True)
-
+                df = pd.DataFrame(data)                  # transforme liste JSON -> tableau
+                st.dataframe(df, use_container_width=True)
     except Exception as e:
-        st.error(f"Erreur /api/infirmiers: {e}")
+            st.error(f"Erreur historique: {e}")
