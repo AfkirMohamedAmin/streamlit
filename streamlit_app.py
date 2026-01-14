@@ -25,7 +25,7 @@ URL_historique_central = f"{BASE}/api/historiquecentral"
 
 
 @st.cache_data(ttl=2, show_spinner=False)
-def get_json(url: str, timeout: int = 8):
+def get_json(url: str, timeout: int = 2):
     r = requests.get(url, timeout=timeout, headers={"Cache-Control": "no-cache"})
     r.raise_for_status()
     return r.json()
@@ -42,7 +42,7 @@ def get_json_stable(key, url):
         return st.session_state[key]
 
 def refresh_now():
-    get_json.clear()   # efface seulement le cache de fetch_json
+    get_json.clear()  
     st.rerun()
 
 
@@ -103,9 +103,7 @@ if page == "Vue générale":
         t2.metric("help", f"{chambre.get('help','-')}")
         t3.metric("sos", f"{chambre.get('sos','-')}")
 
-        st.caption(f"Timestamp chambre: {chambre.get('timestamp','-')}")
-        st.dataframe(to_df(chambre), use_container_width=True)
-
+        st.json(chambre)
     with col_droite:
         st.subheader("Central")
 
@@ -114,11 +112,10 @@ if page == "Vue générale":
         c2.metric("Hum 💧", f"{central.get('hum','-')} %")
 
         x1, x2 = st.columns(2)
-        c1.metric("Seuil", f"{central.get('seuil','-')}")
-        c2.metric("Mode auto", f"{central.get('modauto','-')}")
+        x1.metric("Seuil", f"{central.get('seuil','-')}")
+        x2.metric("Mode auto", f"{central.get('modauto','-')}")
 
-        st.caption(f"Timestamp central: {central.get('timestamp','-')}")
-        st.dataframe(to_df(central), use_container_width=True)
+        st.json(central)
     
     st.subheader("Commandes")
     c1, c2, c3, c4, c5 = st.columns(5)
